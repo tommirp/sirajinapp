@@ -11,7 +11,10 @@ const Layout = () => {
         <main>
           <Outlet />
         </main>
-        <footer>My App Footer</footer>
+        
+        <footer className="footer">
+          <p className="text-muted p-3 text-center">© Copyright <a href="https://kibaraya.com">PT Kibaraya Cipta Inovasi</a> {new Date().getFullYear()}. All Right Reserved</p>
+        </footer>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { Link, useNavigate  } from 'react-router-dom'
 import { getUserInfo } from '../utils/auth'
 import { supabase } from '../supabaseClient'
+import Logo from '../assets/sirajin.png';
 
 export default function Navbar() {
   const navigate = useNavigate()
@@ -41,7 +42,7 @@ export default function Navbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <a className="navbar-brand" href="#">
-        <img src="https://www.adaptivewfs.com/wp-content/uploads/2020/07/logo-placeholder-image.png" width="70" height="70" alt="logo" />
+        <img src={Logo} height={40} alt="logo" />
       </a>
      <button
           className="navbar-toggler"
@@ -71,8 +72,13 @@ export default function Navbar() {
           )}
         </ul>
         <span className="navbar-text" style={{ padding: '0px 20px 0px 10px' }}>
-          Halo, {userInfo.username || userInfo.email} ({userInfo.role}),
-          <button className="btn btn-outline-secondary btn-sm ms-2" onClick={() => signOut()}>Logout</button>
+          <div className="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+            <span className='m-2'>Hello! You are Logged in as </span>
+            <div className="btn-group mr-2" role="group" aria-label="First group">
+              <button type="button" className="btn btn-outline-secondary">{userInfo.username || userInfo.email} ({userInfo.role})</button>
+              <button type="button" className="btn btn-danger" onClick={signOut}><i className='bi bi-box-arrow-right'></i> Sign Out</button>
+            </div>
+          </div>
         </span>
       </div>
     </nav>

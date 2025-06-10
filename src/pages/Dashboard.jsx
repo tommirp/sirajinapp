@@ -70,7 +70,7 @@ export default function Dashboard() {
 
   return (
     <div className="p-4 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+      <h3 className="text-2xl font-bold mb-4">Dashboard</h3>
 
       <div className="row">
         <div className="col-3">

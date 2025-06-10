@@ -21,7 +21,7 @@ export default function AuthGate({ children }) {
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session || !isEmailAllowed(session.user.email)) {
-        alert("Akses ditolak.");
+        // alert("Akses ditolak.");
         await supabase.auth.signOut();
         navigate('/login');
         return;

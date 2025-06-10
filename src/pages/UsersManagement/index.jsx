@@ -40,10 +40,8 @@ export default function UsersManagement() {
   }, [])
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h4 className="text-xl font-bold">Users Management</h4>
-      </div>
+     <div className="p-4 max-w-4xl mx-auto">
+      <h3 className="text-2xl font-bold mb-4">Users Management</h3>
 
       {loading ? (
         <p>Loading...</p>

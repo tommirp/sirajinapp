@@ -34,7 +34,7 @@ export default function WorkingPlansPage() {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
-        <h4 className="text-xl font-bold">Daftar Rencana Kerja</h4>
+        <h3 className="text-xl font-bold">Daftar Rencana Kerja</h3>
         <button
           className="btn btn-primary"
           onClick={() => navigate('/rencana-kerja/tambah')}

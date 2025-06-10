@@ -22,12 +22,13 @@ export async function getUserInfo() {
 
     // Ambil User Role
     const usr_role = await supabase
-      .from('user_roles')
+      .from('registered_users')
       .select('*')
-      .eq('id', user.id)
+      .eq('email', user.email)
       .single()
 
-    if (!usr_role) {
+    if (usr_role.status !== 200 || !usr_role.data) {
+      await supabase.functions.invoke('check-user-login', { body: { user: { id: user.id, email: user.email } } })
       return null
     }
     
