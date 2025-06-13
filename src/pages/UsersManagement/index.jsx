@@ -44,7 +44,12 @@ export default function UsersManagement() {
       <h3 className="text-2xl font-bold mb-4">Users Management</h3>
 
       {loading ? (
-        <p>Loading...</p>
+        <div className="d-flex justify-content-center mt-5 vh-100">
+          <div className="spinner-border text-secondary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <h4 style={{ marginLeft: '10px', marginTop: '5px' }}>Loading...</h4>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <table className="table table-hover">

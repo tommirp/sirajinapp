@@ -66,7 +66,16 @@ export default function PlanDetail() {
   }
 
 
-  if (loading) return <div className="p-6">Loading...</div>
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center  mt-5 vh-100">
+        <div className="spinner-border text-secondary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <h4 style={{ marginLeft: '10px', marginTop: '5px' }}>Loading...</h4>
+      </div>
+    )
+  }
   if (!plan) return <div className="p-6">Rencana kerja tidak ditemukan</div>
 
   return (

@@ -66,7 +66,16 @@ export default function Dashboard() {
     fetchDashboardData()
   }, [])
 
-  if (loading) return <div>Loading...</div>
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center mt-5 vh-100">
+        <div className="spinner-border text-secondary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <h4 style={{ marginLeft: '10px', marginTop: '5px' }}>Loading...</h4>
+      </div>
+    )
+  }
 
   return (
     <div className="p-4 max-w-4xl mx-auto">

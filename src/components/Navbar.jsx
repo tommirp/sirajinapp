@@ -2,47 +2,44 @@
 import React from 'react'
 import { useEffect } from 'react'
 import { Link, useNavigate  } from 'react-router-dom'
-import { getUserInfo } from '../utils/auth'
+import { setUserInfo, getUserInfo } from '../utils/auth'
 import { supabase } from '../supabaseClient'
 import Logo from '../assets/sirajin.png';
 
 export default function Navbar() {
   const navigate = useNavigate()
-  const [userInfo, setUserInfo] = React.useState({})
+  const [userData, setUserData] = React.useState({})
 
   async function signOut() {
     const { error } = await supabase.auth.signOut()
+    
     if (error) {
       console.error('Error logging out:', error.message)
       return
     } else {
       console.log('User logged out successfully')
       // Optionally redirect or update UI here
+      localStorage.removeItem('userSession');
       navigate('/login')
     }
-
-
   }
 
   useEffect(() => {
     const fetchDetail = async () => {  
-      const userInfo = await getUserInfo()
-      if (!userInfo) {
-        console.error('User not found or not logged in')
-        navigate('/login')
-        return
-      }
-
-      setUserInfo(userInfo)
+      setTimeout(async () => {
+        const userInfo = await getUserInfo()
+        setUserData(userInfo)
+      }, 1000)
     }
-
+    
+    setUserInfo()
     fetchDetail()
   }, [])
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light">
+    <nav className="navbar navbar-expand-lg navbar-light fixed-top bg-light">
       <a className="navbar-brand" href="#">
-        <img src={Logo} height={40} alt="logo" />
+        <img src={Logo} height={40} alt="logo" style={{ marginLeft: '20px' }} />
       </a>
      <button
           className="navbar-toggler"
@@ -60,12 +57,12 @@ export default function Navbar() {
           <li className="nav-item" style={{ padding: '0px 10px' }}>
             <Link className="nav-link" to="/">Dashboard</Link>
           </li>
-          {(userInfo.role === 'karyawan' || userInfo.role === 'pimpinan_cabang') && (
+          {(userData.role === 'karyawan' || userData.role === 'pimpinan_cabang') && (
             <li className="nav-item" style={{ padding: '0px 10px' }}>
               <Link className="nav-link" to="/rencana-kerja">Rencana Kerja</Link>
             </li>
           )}
-          {userInfo.role === 'admin' && (
+          {userData.role === 'admin' && (
             <li className="nav-item" style={{ padding: '0px 10px' }}>
               <Link className="nav-link" to="/user-management">User Management</Link>
             </li>
@@ -73,9 +70,8 @@ export default function Navbar() {
         </ul>
         <span className="navbar-text" style={{ padding: '0px 20px 0px 10px' }}>
           <div className="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-            <span className='m-2'>Hello! You are Logged in as </span>
             <div className="btn-group mr-2" role="group" aria-label="First group">
-              <button type="button" className="btn btn-outline-secondary">{userInfo.username || userInfo.email} ({userInfo.role})</button>
+              <button type="button" className="btn btn-outline-secondary">{userData.username || userData.email} ({userData.role})</button>
               <button type="button" className="btn btn-danger" onClick={signOut}><i className='bi bi-box-arrow-right'></i> Sign Out</button>
             </div>
           </div>
