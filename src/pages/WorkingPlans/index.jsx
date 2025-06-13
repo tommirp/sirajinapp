@@ -9,26 +9,46 @@ export default function WorkingPlansPage() {
   const [loading, setLoading] = useState(true)
   const navigate = useNavigate()
 
+  const fetchPlans = async () => {
+    setLoading(true)
+
+    const {
+      data,
+      error
+    } = await supabase
+      .from('working_plans')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) console.error(error)
+    else setPlans(data)
+
+    setLoading(false)
+  }
+
   useEffect(() => {
-    const fetchPlans = async () => {
-      setLoading(true)
-
-      const {
-        data,
-        error
-      } = await supabase
-        .from('working_plans')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) console.error(error)
-      else setPlans(data)
-
-      setLoading(false)
-    }
-
     fetchPlans()
   }, [])
+
+  async function deletePlan(planId, title) {
+    if (!planId) return
+
+    const confirmed = window.confirm(`Are you sure you want to delete this Plan : "${title}"?`)
+
+    if (confirmed) {
+      const { error } = await supabase
+        .from('working_plans')
+        .delete()
+        .eq('id', planId)
+
+      if (error) {
+        alert('Error deleting plan:')
+      } else {
+        alert('Plan deleted successfully')
+        fetchPlans()
+      }
+    }
+  }
 
   return (
     <div className="container-fluid mt-3">
@@ -55,7 +75,7 @@ export default function WorkingPlansPage() {
                 <th scope="col" className='text-center'>Deadline</th>
                 <th scope="col" className='text-center'>Info External</th>
                 <th scope="col" className='text-center'>Realisasi Target</th>
-                <th scope="col" className='text-center'>Perstujuan</th>
+                <th scope="col" className='text-center'>Persetujuan</th>
                 <th scope="col" className='text-center'>Dibuat Oleh</th>
                 <th scope="col" className='text-center'>Tgl Dibuat</th>
               </tr>
@@ -73,20 +93,42 @@ export default function WorkingPlansPage() {
                         </button>
                         {canModifyPlan(plan) ? (
                           <Fragment>
-                            <button
-                              className="btn btn-sm btn-warning"
-                              style={{ marginLeft: '5px' }}
-                              onClick={() => navigate(`/rencana-kerja/${plan.id}`)}
-                            >
-                              <i className='bi bi-pencil-square'></i>
-                            </button>
-                            <button
-                              className="btn btn-sm btn-danger"
-                              style={{ marginLeft: '5px' }}
-                              onClick={() => navigate(`/rencana-kerja/${plan.id}`)}
-                            >
-                              <i className='bi bi-trash'></i>
-                            </button>
+                            {plan.is_approved !== 1 ? (
+                              <Fragment>
+                                <button
+                                  disabled={plan.is_approved === 1}
+                                  className="btn btn-sm btn-warning"
+                                  style={{ marginLeft: '5px' }}
+                                  onClick={() => navigate(`/rencana-kerja/edit/${plan.id}`)}
+                                >
+                                  <i className='bi bi-pencil-square'></i>
+                                </button>
+                                <button
+                                  className="btn btn-sm btn-danger"
+                                  style={{ marginLeft: '5px' }}
+                                  onClick={() => deletePlan(plan.id, plan.title)}
+                                >
+                                  <i className='bi bi-trash'></i>
+                                </button>
+                              </Fragment>
+                            ) : (
+                              <Fragment>
+                                <button
+                                  className="btn btn-sm btn-light"
+                                  disabled={true}
+                                  style={{ marginLeft: '5px', backgroundColor: 'lightgrey' }}
+                                >
+                                  <i className='bi bi-pencil-square'></i>
+                                </button>
+                                <button
+                                  className="btn btn-sm btn-light"
+                                  disabled={true}
+                                  style={{ marginLeft: '5px', backgroundColor: 'lightgrey' }}
+                                >
+                                  <i className='bi bi-trash'></i>
+                                </button>
+                              </Fragment>
+                            )}
                           </Fragment>
                         ) : ""}
                     </div>
@@ -96,7 +138,7 @@ export default function WorkingPlansPage() {
                   <td className='text-center'>{plan.deadline_date}</td>
                   <td>{plan.external_info}</td>
                   <td className='text-center'>{plan.realization_target}</td>
-                  <td className='text-center'>{plan.approved_by ? `Telah Disetujui Oleh ${plan.approved_by}` : 'Belum Disetujui'}</td>
+                  <td className='text-center' style={{ color: plan.is_approved === 1 ? 'green' : 'black' }}>{plan.is_approved === 1 ? `Disetujui (${plan.approved_by || '-'})` : 'Belum Disetujui'}</td>
                   <td className='text-center'>{plan.created_by}</td>
                   <td className='text-center'>{plan.created_at ? new Date(plan.created_at).toLocaleString() : ''}</td>
                 </tr>

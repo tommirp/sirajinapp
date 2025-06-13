@@ -32,6 +32,7 @@ export async function setUserInfo() {
       userId: user.id,
       username: user.user_metadata.full_name || user.email,
       branch: usr_role.data.branch.master_name,
+      branch_region: usr_role.data.branch.master_group,
       branch_code: usr_role.data.branch.master_code,
       email: user.email,
       role: usr_role.data.role

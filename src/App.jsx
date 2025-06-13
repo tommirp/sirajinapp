@@ -6,6 +6,7 @@ import AddPlanForm from './pages/WorkingPlans/AddPlanForm'
 import PlanDetail from './pages/WorkingPlans/PlanDetail'
 import AddActivityForm from './pages/WorkingPlans/AddActivityForm'
 import EditActivityForm from './pages/WorkingPlans/EditActivityForm'
+import EditPlanForm from './pages/WorkingPlans/EditPlanForm'
 import Dashboard from './pages/Dashboard'
 import Layout from './components/Layout'
 import UsersManagement from './pages/UsersManagement'
@@ -33,6 +34,11 @@ function App() {
           <Route path="/rencana-kerja/tambah" element={
             <AuthGate>
               <AddPlanForm />
+            </AuthGate>
+          } />
+          <Route path="/rencana-kerja/edit/:id" element={
+            <AuthGate>
+              <EditPlanForm />
             </AuthGate>
           } />
           <Route path="/rencana-kerja/:id" element={

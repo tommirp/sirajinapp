@@ -1,11 +1,14 @@
-// /src/pages/WorkingPlans/AddPlanForm.jsx
+// /src/pages/WorkingPlans/EditPlanForm.jsx
 import { useEffect, useState, Fragment } from 'react'
 import { supabase } from '../../supabaseClient'
 import { useNavigate } from 'react-router-dom'
 import { getUserInfo } from '../../utils/auth'
 import Select from 'react-select';
+import { useParams } from 'react-router-dom';
 
-export default function AddPlanForm() {
+export default function EditPlanForm() {
+  const { id: planId } = useParams();
+
   const [title, setTitle] = useState('')
   const [kpiIndicator, setKpiIndicator] = useState('')
   const [startDate, setStartDate] = useState('')
@@ -13,6 +16,7 @@ export default function AddPlanForm() {
   const [realizationTarget, setRealizationTarget] = useState('')
   const [externalInfo, setExternalInfo] = useState('')
   const [alertMsg, setAlertMsg] = useState('')
+  const [isDisabled, setDisabled] = useState(false)
   
   const [options, setOptions] = useState([]);
   const [involvedUsers, setInvolvedUsers] = useState([]);
@@ -42,8 +46,8 @@ export default function AddPlanForm() {
       return
     }
 
-    // Insert ke supabase
-    const { data, error } = await supabase.from('working_plans').insert({
+    // Update ke supabase
+    await supabase.from('working_plans').update({
       title,
       kpi_indicator: kpiIndicator,
       start_date: startDate,
@@ -52,14 +56,12 @@ export default function AddPlanForm() {
       external_info: externalInfo,
       created_by: user.email,
       is_approved: 0,
-    }).select('id').single();
+    }).eq('id', planId);
 
     if (error) {
       setAlertMsg(error.message)
       return
     }
-
-    const planId = data?.id;
 
     // Insert ke involved_users
     if (involvedUsers.length > 0) {
@@ -77,42 +79,90 @@ export default function AddPlanForm() {
       }
     }
 
-    // Reset form fields
-    setTitle('')
-    setKpiIndicator('')
-    setStartDate('')
-    setDeadlineDate('')
-    setRealizationTarget('')
-    setExternalInfo('')
-    setInvolvedUsers([])
-
     // Show success message
-    setAlertMsg('Working plan created successfully!')
+    setAlertMsg('Working plan update successfully!')
   }
+  
+  const fetchFirst = async () => {  
+    const { data: planData, error: planError } = await supabase
+      .from('working_plans')
+      .select('*')
+      .eq('id', planId)
+      .single();
+      
+    if (planError) {
+      console.error(planError);
+      return;
+    }
 
-  useEffect(() => {    
-    const fetchUsers = async () => {
-      const { data, error } = await supabase
-        .from('registered_users')
-        .select('*');
+    // Jika tidak ada data rencana kerja, redirect ke halaman daftar rencana kerja
+    if (!planData) {
+      navigate('/rencana-kerja');
+      return;
+    }
 
-      if (error) {
-        console.error(error);
-        return [];
+    if (planData) {
+      if (planData.is_approved === 1) {
+        setAlertMsg('This working plan has already been approved and cannot be modified.');
+        // disable all input fields
+        setDisabled(true);
       }
 
-      const items = data.map((item) => ({
-        value: item.id,
-        label: item.full_name,
-        item,
+      setTitle(planData.title);
+      setKpiIndicator(planData.kpi_indicator);
+      setStartDate(planData.start_date);
+      setDeadlineDate(planData.deadline_date);
+      setRealizationTarget(planData.realization_target);
+      setExternalInfo(planData.external_info);
+
+      const { data: involvedData, error: involvedError } = await supabase
+        .from('working_plans_employees')
+        .select('*, user:registered_users(*)')
+        .eq('working_plan_id', planId)
+
+      if (involvedError) {
+        console.error(involvedError); 
+        return;
+      }
+
+      // Map involved users to the format required by react-select
+      const involvedUsersData = involvedData.map(item => ({
+        value: item.user.id,
+        label: item.user.full_name,
+        item: item.user,
       }));
+  
+      // Set the involved users state
+      setInvolvedUsers(involvedUsersData);
+    }
 
-      setOptions(items);
-      return;
-    };
+    // Fetch all registered users for the select options
+    const { data, error } = await supabase
+      .from('registered_users')
+      .select('*')
+      .eq('is_active', Number(1))
 
-    fetchUsers();
-  }, []);
+    if (error) {
+      console.error(error);
+      return [];
+    }
+
+    const items = data.map((item) => ({
+      value: item.id,
+      label: item.full_name,
+      item,
+    }));
+
+    setOptions(items);
+    return;
+  };
+
+  useEffect(() => {
+    if (planId)
+    {
+      fetchFirst();
+    }
+  }, [planId]);
 
   const handleSelected = (selectedOptions) => {
     if (selectedOptions) {
@@ -124,6 +174,10 @@ export default function AddPlanForm() {
       }
     }
   };
+
+  function goToActivities() {
+    navigate(`/rencana-kerja/${planId}`);
+  }
 
   return (
     <div className='d-flex justify-content-center align-items-center mt-3'>
@@ -138,7 +192,7 @@ export default function AddPlanForm() {
               >
                 <i className='bi bi-arrow-left'></i>
               </button>
-              <h3 className="text-xl font-semibold" style={{ marginLeft: '20px' }}>Tambah Rencana Kerja Baru</h3>
+              <h3 className="text-xl font-semibold" style={{ marginLeft: '20px' }}>Ubah Rencana Kerja</h3>
             </div>
             {alertMsg && alertMsg.includes('created successfully') ? (
               <Fragment>
@@ -161,6 +215,7 @@ export default function AddPlanForm() {
               <div className="col-8">
                 <label>Judul</label>
                 <input
+                  disabled={isDisabled}
                   type="text"
                   className="form-control"
                   value={title}
@@ -170,6 +225,7 @@ export default function AddPlanForm() {
               <div className="col-4">
                 <label>KPI Indicator</label>
                 <input
+                  disabled={isDisabled}
                   type="text"
                   className="form-control"
                   value={kpiIndicator}
@@ -179,6 +235,7 @@ export default function AddPlanForm() {
               <div className="col-4">
                 <label>Tanggal Mulai</label>
                 <input
+                  disabled={isDisabled}
                   type="date"
                   className="form-control"
                   value={startDate}
@@ -188,6 +245,7 @@ export default function AddPlanForm() {
               <div className="col-4">
                 <label>Tanggal Deadline</label>
                 <input
+                  disabled={isDisabled}
                   type="date"
                   className="form-control"
                   value={deadlineDate}
@@ -197,6 +255,7 @@ export default function AddPlanForm() {
               <div className="col-4">
                 <label>Target Realisasi</label>
                 <input
+                  disabled={isDisabled}
                   type="number"
                   className="form-control"
                   value={realizationTarget}
@@ -206,23 +265,29 @@ export default function AddPlanForm() {
               <div className="col-12">
                 <label>Informasi Eksternal</label>
                 <textarea
+                  disabled={isDisabled}
                   className="form-control"
                   value={externalInfo}
                   onChange={(e) => setExternalInfo(e.target.value)}
                 ></textarea>
               </div>
               <div className="col-12">
-                <hr />
-                <h6>Search & Select Employees :</h6>
-                <div className="w-full">
-                  <Select
-                    onChange={handleSelected}
-                    options={options}
-                    placeholder="Search and select Employee..."
-                    isClearable
-                    isSearchable
-                  />
-                </div>
+                {!isDisabled && (
+                  <Fragment>
+                    <hr />
+                    <h6>Search & Select Employees :</h6>
+                    <div className="w-full">
+                      <Select
+                        isDisabled={isDisabled}
+                        onChange={handleSelected}
+                        options={options}
+                        placeholder="Search and select Employee..."
+                        isClearable
+                        isSearchable
+                      />
+                    </div>
+                  </Fragment>
+                )}
                 {involvedUsers.length > 0 && (
                   <div className="mt-3">
                     <h6>Selected Employees:</h6>
@@ -230,17 +295,19 @@ export default function AddPlanForm() {
                       {involvedUsers.map((user, index) => (
                         <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
                           {index + 1}. {user.label} ({user.item.email})
-                          <button
-                            type="button"
-                            className="btn btn-danger btn-sm"
-                            style={{ float: 'right' }}
-                            onClick={() => {
-                              const updatedUsers = involvedUsers.filter(x => x.item.id !== user.item.id);
-                              setInvolvedUsers(updatedUsers);
-                            }}
-                          >
-                            <i className="bi bi-trash"></i>
-                          </button>
+                          {!isDisabled ? (
+                            <button
+                              type="button"
+                              className="btn btn-danger btn-sm"
+                              style={{ float: 'right' }}
+                              onClick={() => {
+                                const updatedUsers = involvedUsers.filter(x => x.item.id !== user.item.id);
+                                setInvolvedUsers(updatedUsers);
+                              }}
+                            >
+                              <i className="bi bi-trash"></i>
+                            </button>
+                          ) : ""}
                         </li>
                       ))}
                     </ul>
@@ -248,9 +315,15 @@ export default function AddPlanForm() {
                 )}
                 <hr style={{ marginBottom: '0px' }} />
               </div>
-              <div className="col-12">
-                <button type="submit" className="btn btn-primary" style={{ float: 'right' }}>Save Working Plan</button>
-              </div>
+              {isDisabled ? (
+                <div className="col-12">
+                  <button className="btn btn-success" onClick={goToActivities} style={{ float: 'right' }}>Manage Plan Activities</button>
+                </div>
+              ) : (
+                <div className="col-12">
+                  <button type="submit" className="btn btn-success" style={{ float: 'right' }}>Save Working Plan</button>
+                </div>
+              )}
             </form>
           </div>
         </div>

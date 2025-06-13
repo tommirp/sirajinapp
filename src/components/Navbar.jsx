@@ -24,6 +24,19 @@ export default function Navbar() {
     }
   }
 
+  function printRole(role) {
+    return role.replace('_', ' ').toUpperCase();
+  }
+
+  async function showUserDetail() {
+    const userInfo = await getUserInfo()
+    if (userInfo) {
+      alert(`Username: ${userInfo.username}\nEmail: ${userInfo.email}\nRole: ${printRole(userInfo.role)}\nBranch: ${userInfo.branch}\nBranch Region: ${userInfo.branch_region}`)
+    } else {
+      alert('User information not available.')
+    }
+  }
+
   useEffect(() => {
     const fetchDetail = async () => {  
       setTimeout(async () => {
@@ -71,7 +84,7 @@ export default function Navbar() {
         <span className="navbar-text" style={{ padding: '0px 20px 0px 10px' }}>
           <div className="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
             <div className="btn-group mr-2" role="group" aria-label="First group">
-              <button type="button" className="btn btn-outline-secondary">{userData.username || userData.email} ({userData.role})</button>
+              <button type="button" className="btn btn-outline-secondary" onClick={showUserDetail}>{userData.username || userData.email}</button>
               <button type="button" className="btn btn-danger" onClick={signOut}><i className='bi bi-box-arrow-right'></i> Sign Out</button>
             </div>
           </div>
