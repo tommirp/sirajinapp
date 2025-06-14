@@ -2,7 +2,7 @@
 import React from 'react'
 import { useEffect } from 'react'
 import { Link, useNavigate  } from 'react-router-dom'
-import { setUserInfo, getUserInfo } from '../utils/auth'
+import { getUserInfo } from '../utils/auth'
 import { supabase } from '../supabaseClient'
 import Logo from '../assets/sirajin.png';
 
@@ -20,6 +20,7 @@ export default function Navbar() {
       console.log('User logged out successfully')
       // Optionally redirect or update UI here
       localStorage.removeItem('userSession');
+      localStorage.removeItem('usersList');
       navigate('/login')
     }
   }
@@ -45,7 +46,6 @@ export default function Navbar() {
       }, 1000)
     }
     
-    setUserInfo()
     fetchDetail()
   }, [])
 
@@ -70,16 +70,12 @@ export default function Navbar() {
           <li className="nav-item" style={{ padding: '0px 10px' }}>
             <Link className="nav-link" to="/">Dashboard</Link>
           </li>
-          {(userData.role === 'karyawan' || userData.role === 'pimpinan_cabang') && (
-            <li className="nav-item" style={{ padding: '0px 10px' }}>
-              <Link className="nav-link" to="/rencana-kerja">Rencana Kerja</Link>
-            </li>
-          )}
-          {userData.role === 'admin' && (
-            <li className="nav-item" style={{ padding: '0px 10px' }}>
-              <Link className="nav-link" to="/user-management">User Management</Link>
-            </li>
-          )}
+          <li className="nav-item" style={{ padding: '0px 10px' }}>
+            <Link className="nav-link" to="/rencana-kerja">Rencana Kerja</Link>
+          </li>
+          <li className="nav-item" style={{ padding: '0px 10px' }}>
+            <Link className="nav-link" to="/user-management">User Management</Link>
+          </li>
         </ul>
         <span className="navbar-text" style={{ padding: '0px 20px 0px 10px' }}>
           <div className="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">

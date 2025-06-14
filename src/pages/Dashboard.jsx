@@ -80,22 +80,112 @@ export default function Dashboard() {
   return (
     <div className="p-4 max-w-4xl mx-auto">
       <h3 className="text-2xl font-bold mb-4">Dashboard</h3>
-
+      <div className="row mb-3">
+        <div className="col-2">
+          <label>Data Period/Year</label>
+          <select className='form-control'>
+            <option value="2024">2024</option>
+            <option value="2025" selected>2025</option>
+            <option value="2026">2026</option>
+          </select>
+        </div>
+        <div className="col-2">
+          <label>Region</label>
+          <select className='form-control'>
+            <option value="Riau" selected>Riau</option>
+          </select>
+        </div>
+        <div className="col-2">
+          <label>Branch</label>
+          <select className='form-control'>
+            <option value="Dumai" selected>Dumai</option>
+          </select>
+        </div>
+        <div className="col-2">
+          <label>Sub Branch</label>
+          <select className='form-control'>
+            <option value="KCP Dumai Kota" selected>KCP Dumai Kota</option>
+          </select>
+        </div>
+      </div>
+      <hr />
       <div className="row">
-        <div className="col-3">
-          <div className="p-4 rounded shadow text-center">
-            <h5 className="text-lg font-semibold">Total Rencana Kerja</h5>
-            <p className="text-3xl font-bold">{planCount}</p>
+        <div className="col-2">
+          <div className="rounded shadow text-center" style={{ padding: '15px 2px 4px 2px' }}>
+            <h5 className="text-lg font-semibold" style={{ fontSize: '13px' }}>TOTAL RENCANA KERJA</h5>
+            <p className="text-3xl font-bold">0</p>
           </div>
         </div>
-        <div className="col-3">
-          <div className="p-4 rounded shadow text-center">
-            <h5 className="text-lg font-semibold">Total Aktivitas</h5>
-            <p className="text-3xl font-bold">{activityCount}</p>
+        <div className="col-2">
+          <div className="rounded shadow text-center" style={{ padding: '15px 2px 4px 2px' }}>
+            <h5 className="text-sm font-semibold" style={{ fontSize: '13px' }}>TOTAL KEGIATAN</h5>
+            <p className="text-3xl font-bold">0</p>
+          </div>
+        </div>
+        <div className="col-2">
+          <div className="rounded shadow text-center" style={{ padding: '15px 2px 4px 2px' }}>
+            <h5 className="text-sm font-semibold" style={{ fontSize: '13px' }}>% REALISASI</h5>
+            <p className="text-3xl font-bold">0%</p>
+          </div>
+        </div>
+        <div className="col-2">
+          <div className="rounded shadow text-center" style={{ padding: '15px 2px 4px 2px' }}>
+            <h5 className="text-sm font-semibold" style={{ fontSize: '13px' }}>RK TAHUN LALU VS KINI</h5>
+            <p className="text-3xl font-bold">^0%</p>
+          </div>
+        </div>
+        <div className="col-2">
+          <div className="rounded shadow text-center" style={{ padding: '15px 2px 4px 2px' }}>
+            <h5 className="text-sm font-semibold" style={{ fontSize: '13px' }}>KARYAWAN TERLIBAT</h5>
+            <p className="text-3xl font-bold">0</p>
+          </div>
+        </div>
+        <div className="col-2">
+          <div className="rounded shadow text-center" style={{ padding: '15px 2px 4px 2px' }}>
+            <h5 className="text-sm font-semibold" style={{ fontSize: '13px' }}>KARYAWAN TIDAK TERLIBAT</h5>
+            <p className="text-3xl font-bold">0</p>
           </div>
         </div>
       </div>
-
+      <div className="row mt-3">
+        <div className="col-2">
+          <div className="rounded shadow text-center" style={{ padding: '15px 2px 4px 2px' }}>
+            <h5 className="text-sm font-semibold" style={{ fontSize: '13px' }}>TOTAL RK SELESAI</h5>
+            <p className="text-3xl font-bold">0</p>
+          </div>
+        </div>
+        <div className="col-2">
+          <div className="rounded shadow text-center" style={{ padding: '15px 2px 4px 2px' }}>
+            <h5 className="text-sm font-semibold" style={{ fontSize: '13px' }}>TOTAL RK BELUM DISETUJUI</h5>
+            <p className="text-3xl font-bold">0</p>
+          </div>
+        </div>
+        <div className="col-2">
+          <div className="rounded shadow text-center" style={{ padding: '15px 2px 4px 2px' }}>
+            <h5 className="text-sm font-semibold" style={{ fontSize: '13px' }}>TOTAL TARGET REALISASI</h5>
+            <p className="text-3xl font-bold">0</p>
+          </div>
+        </div>
+        <div className="col-2">
+          <div className="rounded shadow text-center" style={{ padding: '15px 2px 4px 2px' }}>
+            <h5 className="text-sm font-semibold" style={{ fontSize: '13px' }}>TOTAL HASIL REALISASI</h5>
+            <p className="text-3xl font-bold">0</p>
+          </div>
+        </div>
+        <div className="col-2">
+          <div className="rounded shadow text-center" style={{ padding: '15px 2px 4px 2px' }}>
+            <h5 className="text-sm font-semibold" style={{ fontSize: '13px' }}>TOTAL CAPAI TARGET</h5>
+            <p className="text-3xl font-bold">0%</p>
+          </div>
+        </div>
+        <div className="col-2">
+          <div className="rounded shadow text-center" style={{ padding: '15px 2px 4px 2px' }}>
+            <h5 className="text-sm font-semibold" style={{ fontSize: '13px' }}>TOTAL TIDAK CAPAI TARGET</h5>
+            <p className="text-3xl font-bold">0%</p>
+          </div>
+        </div>
+      </div>
+{/* 
       <section className="mb-8 mt-5">
         <h3 className="text-xl font-semibold mb-2">Rencana Kerja Terbaru</h3>
         <ul className="list-disc list-inside">
@@ -116,7 +206,7 @@ export default function Dashboard() {
             </li>
           ))}
         </ul>
-      </section>
+      </section> */}
     </div>
   )
 }

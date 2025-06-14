@@ -1,21 +1,39 @@
 import { Fragment, useEffect, useState } from 'react';
-import { supabase } from '../supabaseClient';
 import Logo from '../assets/sirajin.png';
 
 export default function Login() {
   const [isEmailInput, setIsEmailInput] = useState(false);
   const [emailInput, setEmailInput] = useState('');
-  const [disabledBtn, setDisabledBtn] = useState(false);
+  const [alertMsg, setAlertMsg] = useState('');
+  const [disabledBtn, setDisabledBtn] = useState(true);
+
+  const developersMail = [
+    'tomxwork@gmail.com',
+    // 'tanyatommi@gmail.com',
+    // 'noobologi@gmail.com',
+  ];
+
+  const validEmailDomain = [
+    'bpjsketenagakerjaan.go.id',
+  ];
 
   const handleEmailInput = (e) => {
     const email = e.target.value;
     setEmailInput(email || '');
 
     if (email) {
-      const tempMail = `${email === 'tom' ? 'tomxwork@gmail.com' : `${email}@bpjsketenagakerjaan.go.id`}`; 
-      localStorage.setItem('email', tempMail);
+      const isValidDevEmail = developersMail.includes(email);
+      const isValidEmail = validEmailDomain.includes(email.split('@')[1]);
+
+      if (isValidDevEmail || isValidEmail) {
+        localStorage.setItem('email', email);
+        setAlertMsg('');
+        setDisabledBtn(false);
+      } else {
+        setAlertMsg('Email Not Valid! Please Use Email From @bpjsketenagakerjaan.go.id')
+        setDisabledBtn(true);
+      }
     } else {
-      alert('Please insert your email first');
       e.target.focus();
     }
   }
@@ -41,7 +59,6 @@ export default function Login() {
       body: JSON.stringify({ email }),
     }).then((response) => response.json())
       .then((registered_user) => {    
-          console.log(registered_user);
           if (!registered_user.status || registered_user.status !== 200) {
             alert('Account not registered, please contact your admin');
             setDisabledBtn(false);
@@ -86,21 +103,17 @@ export default function Login() {
                     {localStorage.getItem('email') && (
                       <p style={{ textAlign: 'center' }}>Email : <b>{localStorage.getItem('email')}</b></p>
                     )}
-                    <button type="button" className="login-with-google-btn" onClick={handleLogin} disabled={disabledBtn}>
+                    <button type="button" className="login-with-google-btn" onClick={handleLogin}>
                       Sign in with Google
                     </button>
                     <div style={{ textAlign: 'center', cursor: 'pointer', fontSize: '14px', color: 'blue' }} className="mt-4" onClick={changeEmail}><i>Click Here to Change Email</i></div>
                   </Fragment>
                 ) : (
                   <Fragment>
-                    <div className="mx-auto" >
-                      <div className="input-group mb-3">
-                        <input disabled={disabledBtn} type="text" name='email' onChange={handleEmailInput} value={emailInput} aria-describedby="basic-addon2" style={{ textAlign: 'right' }} className='form-control' placeholder='Insert Email User' />
-                        <div style={{ "border":"1px solid #dee2e6","padding":"5px 10px","backgroundColor":"var(--bs-border-color)","borderTopRightRadius":"5px","borderBottomRightRadius":"5px" }}>
-                          @bpjsketenagakerjaan.go.id
-                        </div>
-                      </div>
+                    <div className='d-flex justify-content-center'>
+                      <input type="email" name='email' onChange={handleEmailInput} value={emailInput} style={{ textAlign: 'center', width: '70%' }} className='form-control mb-3' placeholder='Insert Email User' />
                     </div>
+                    {alertMsg && (<p className="mb-3" style={{ color: 'red', textAlign: 'center', fontSize: '11px' }}><b><i>{alertMsg}</i></b></p>)}
                     <button type="button" className="login-with-google-btn" onClick={handleLogin} disabled={disabledBtn}>Sign in with Google</button>
                   </Fragment>
                 )}

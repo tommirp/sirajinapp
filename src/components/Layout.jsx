@@ -1,12 +1,14 @@
 // src/components/Layout.jsx
 import React, { useEffect } from 'react'
 import Navbar from './Navbar'
+import { initLocalData } from '../utils/auth';
 import { Outlet } from 'react-router-dom'
 
 const Layout = () => {
   const [isLoading, setIsLoading] = React.useState(true);
 
   useEffect(() => {
+    initLocalData();
     setTimeout(() => {
       // Simulate a delay for loading
       setIsLoading(false);
