@@ -64,101 +64,131 @@ export default function PlanDetail() {
       setWorkingPlan({ ...workingPlan, is_approved: 1, approved_by: email })
     }
   }
+  
+  async function autoGenerateActivitiesByAI(planId) {
+    if (!planId) return
 
+    const confirmed = window.confirm(`Are you sure you want to delete this Plan : "${title}"?`)
 
-  if (loading) {
-    return (
-      <div className="d-flex justify-content-center  mt-5 vh-100">
-        <div className="spinner-border text-secondary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-        <h4 style={{ marginLeft: '10px', marginTop: '5px' }}>Loading...</h4>
-      </div>
-    )
+    if (confirmed) {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const res = await fetch(`${supabaseUrl}/functions/v1/generate-working-activities`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-working-plan-id": String(planId),
+            Authorization: `Bearer ${supabase.auth.getSession()?.access_token ?? ""}` // jika perlu akses login user
+          },
+          body: JSON.stringify({})
+        }
+      );
+
+      if (!res.ok) alert("Failed to auto generate activities by AI!");
+    }
   }
-  if (!plan) return <div className="p-6">Rencana kerja tidak ditemukan</div>
 
-  return (
-    <div className="p-6">
-      <button
-        onClick={() => navigate('/rencana-kerja')}
-        className="text-sm text-blue-600 mb-4"
-      >
-        ← Kembali
-      </button>
 
-      <h2 className="text-2xl font-semibold mb-2">{plan.title}</h2>
-      {workingPlan?.is_approved === 1 ? (
-        <span className="text-green-600 font-semibold">✅ Telah Disetujui Oleh : {workingPlan.approved_by}</span>
-      ) : (
-        <div className="flex items-center gap-3">
-          <span className="text-yellow-600 font-semibold">⏳ Belum Disetujui</span>
-          {userRole === 'pimpinan_cabang' && (
-            <button
-              onClick={handleApprove}
-              className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-            >
-              Setujui
-            </button>
-          )}
-        </div>
-      )}
-
-      <p className="text-sm text-gray-500 mb-2">KPI: {plan.kpi_indicator}</p>
-      <p className="mb-4">
-        Mulai: {plan.start_date} | Deadline: {plan.deadline_date}
-      </p>
-      <p className="mb-6">{plan.external_info}</p>
-
-      <div className="flex justify-between items-center mb-2">
-        <h3 className="text-xl font-semibold">Daftar Kegiatan</h3>
-        <button
-          onClick={() => navigate(`/rencana-kerja/${id}/tambah-activity`)}
-          className="bg-blue-600 text-white px-3 py-2 rounded"
-        >
-          + Tambah Activity
-        </button>
+    <div className="container-fluid mt-3">
+      <div className="d-flex justify-between items-center mb-4">
+        <h3 className="text-xl font-bold">Daftar Rencana Kerja</h3>
+        <button className="btn btn-sm btn-outline-secondary" style={{ marginLeft: '20px', height: '30px', marginTop: '5px' }} onClick={() => navigate('/rencana-kerja/tambah')}>+ Tambah</button>
       </div>
 
-      {activities.length === 0 ? (
-        <p className="text-sm text-gray-500">Belum ada kegiatan.</p>
+      {loading ? (
+          <div className="d-flex justify-content-center mt-5 vh-100">
+            <div className="spinner-border text-secondary" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <h4 style={{ marginLeft: '10px', marginTop: '5px' }}>Loading...</h4>
+          </div>
       ) : (
-        <ul className="space-y-4">
-          {activities.map((activity) => (
-            <li
-              key={activity.id}
-              className="border p-4 rounded shadow-sm hover:shadow"
-            >
-              <h4 className="font-medium">{activity.title}</h4>
-              <p className="text-sm text-gray-600">
-                {activity.start_date} → {activity.end_date}
+        <div className="row">
+          <div className="col-1">
+              <button
+                onClick={() => navigate('/rencana-kerja')}
+                className="btn btn-md btn-outline-secondary mb-4"
+              >
+                ← Kembali
+              </button>
+          </div>
+          <div className="col-11">
+            <h4 className="text-2xl font-semibold mb-2">{plan.title}</h4>
+          </div>
+          <div className="col-12">
+              {workingPlan?.is_approved === 1 ? (
+                <span className="text-green-600 font-semibold">✅ Telah Disetujui Oleh : {workingPlan.approved_by}</span>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <span className="text-yellow-600 font-semibold">⏳ Belum Disetujui</span>
+                  {userRole === 'pimpinan_cabang' && (
+                    <button
+                      onClick={handleApprove}
+                      className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                    >
+                      Setujui
+                    </button>
+                  )}
+                </div>
+              )}
+
+              <p className="text-sm text-gray-500 mb-2">KPI: {plan.kpi_indicator}</p>
+              <p className="mb-4">
+                Mulai: {plan.start_date} | Deadline: {plan.deadline_date}
               </p>
-              <p className="text-sm">{activity.activity_type}</p>
-              <div className="flex gap-2 mt-2">
+              <p className="mb-6">{plan.external_info}</p>
+
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-xl font-semibold">Daftar Kegiatan</h3>
                 <button
-                  onClick={() =>
-                    navigate(`/rencana-kerja/${plan.id}/edit-activity/${activity.id}`)
-                  }
-                  className="text-sm text-blue-600"
+                  onClick={() => navigate(`/rencana-kerja/${id}/tambah-activity`)}
+                  className="bg-blue-600 text-white px-3 py-2 rounded"
                 >
-                  ✏️ Edit
-                </button>
-                <button
-                  onClick={async () => {
-                    if (confirm('Yakin ingin menghapus?')) {
-                      await supabase.from('working_activities').delete().eq('id', activity.id)
-                      setActivities((prev) => prev.filter((a) => a.id !== activity.id))
-                    }
-                  }}
-                  className="text-sm text-red-600"
-                >
-                  🗑️ Hapus
+                  + Tambah Activity
                 </button>
               </div>
-            </li>
-          ))}
-        </ul>
+
+              {activities.length === 0 ? (
+                <p className="text-sm text-gray-500">Belum ada kegiatan.</p>
+              ) : (
+                <ul className="space-y-4">
+                  {activities.map((activity) => (
+                    <li
+                      key={activity.id}
+                      className="border p-4 rounded shadow-sm hover:shadow"
+                    >
+                      <h4 className="font-medium">{activity.title}</h4>
+                      <p className="text-sm text-gray-600">
+                        {activity.start_date} → {activity.end_date}
+                      </p>
+                      <p className="text-sm">{activity.activity_type}</p>
+                      <div className="flex gap-2 mt-2">
+                        <button
+                          onClick={() =>
+                            navigate(`/rencana-kerja/${plan.id}/edit-activity/${activity.id}`)
+                          }
+                          className="text-sm text-blue-600"
+                        >
+                          ✏️ Edit
+                        </button>
+                        <button
+                          onClick={async () => {
+                            if (confirm('Yakin ingin menghapus?')) {
+                              await supabase.from('working_activities').delete().eq('id', activity.id)
+                              setActivities((prev) => prev.filter((a) => a.id !== activity.id))
+                            }
+                          }}
+                          className="text-sm text-red-600"
+                        >
+                          🗑️ Hapus
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+          </div>
+        </div>
       )}
     </div>
-  )
 }

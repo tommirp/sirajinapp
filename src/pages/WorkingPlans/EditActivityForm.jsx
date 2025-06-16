@@ -53,7 +53,7 @@ export default function EditActivityForm() {
 
   return (
     <div className="p-6 max-w-xl mx-auto">
-      <h3 className="text-xl font-semibold mb-4">Edit Kegiatan</h3>
+      <h4 className="text-xl font-semibold mb-4">Edit Kegiatan</h4>
       {errorMsg && <p className="text-red-600">{errorMsg}</p>}
       <form onSubmit={handleUpdate} className="space-y-4">
         <input

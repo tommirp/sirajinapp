@@ -192,7 +192,7 @@ export default function EditPlanForm() {
               >
                 <i className='bi bi-arrow-left'></i>
               </button>
-              <h3 className="text-xl font-semibold" style={{ marginLeft: '20px' }}>Ubah Rencana Kerja</h3>
+              <h4 className="text-xl font-semibold" style={{ marginLeft: '20px' }}>Ubah Rencana Kerja</h4>
             </div>
             {alertMsg && alertMsg.includes('created successfully') ? (
               <Fragment>

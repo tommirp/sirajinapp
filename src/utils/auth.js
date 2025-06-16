@@ -43,29 +43,29 @@ export async function initLocalData() {
         
         localStorage.setItem('userSession', JSON.stringify(usr))
 
-      } else {
-        return null
-      }
-  
-      // get list of users for selections
-      const { data: listOfUsers } = await supabase
-        .from('registered_users')
-        .select('*, user_role: user_roles(*), area: master_data(*)')
-        .eq('area.parent', usr.branch_parent_code)
-        .eq('is_active', 1);
+        // get list of users for selections
+        const { data: listOfUsers } = await supabase
+          .from('registered_users')
+          .select('*, user_role: user_roles(*), area: master_data(*)')
+          .eq('area.parent', usr.branch_parent_code)
+          .eq('is_active', 1);
 
-      if (listOfUsers && listOfUsers.data && listOfUsers.data.id) {
-        const listOfUsers_items = listOfUsers.map((item) => ({
-          value: item.id,
-          label: item.full_name,
-          email: item.email,
-          area: item.area.master_name,
-          area_code: item.area.code,
-          role: item.user_role.role_name, 
-          role_code: item.user_role.code, 
-        }));
-    
-        localStorage.setItem('usersList', JSON.stringify(listOfUsers_items));
+        if (listOfUsers && listOfUsers.data && listOfUsers.data.id) {
+          const listOfUsers_items = listOfUsers.map((item) => ({
+            value: item.id,
+            label: item.full_name,
+            email: item.email,
+            area: item.area.master_name,
+            area_code: item.area.code,
+            role: item.user_role.role_name, 
+            role_code: item.user_role.code, 
+          }));
+      
+          localStorage.setItem('usersList', JSON.stringify(listOfUsers_items));
+
+        } else {
+          return null
+        }
 
       } else {
         return null

@@ -78,7 +78,7 @@ export default function AddActivityForm() {
 
   return (
     <div className="max-w-xl mx-auto p-6">
-      <h3 className="text-xl font-semibold mb-4">Tambah Kegiatan</h3>
+      <h4 className="text-xl font-semibold mb-4">Tambah Kegiatan</h4>
       {errorMsg && <p className="text-red-600 mb-2">{errorMsg}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
