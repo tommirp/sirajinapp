@@ -1,7 +1,10 @@
 import { Fragment, useEffect, useState } from 'react';
 import Logo from '../assets/sirajin.png';
+import { supabase } from "../supabaseClient"
+import { useNavigate } from 'react-router-dom'
 
 export default function Login() {
+  const navigate = useNavigate()
   const [isEmailInput, setIsEmailInput] = useState(false);
   const [emailInput, setEmailInput] = useState('');
   const [alertMsg, setAlertMsg] = useState('');
@@ -79,7 +82,16 @@ export default function Login() {
       });
   }
 
+  async function checkLogin() {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user && user.email) return true;
+    return false;
+  }
+
   useEffect(() => {
+    const isLoggedIn = checkLogin();
+    if (isLoggedIn) navigate('/rencana-kerja')
+
     const storedEmail = localStorage.getItem('email');
     setEmailInput(storedEmail || '');
     setIsEmailInput(storedEmail ? true : false);

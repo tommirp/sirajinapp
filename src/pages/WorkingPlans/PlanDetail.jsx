@@ -88,13 +88,8 @@ export default function PlanDetail() {
     }
   }
 
-
+  return (
     <div className="container-fluid mt-3">
-      <div className="d-flex justify-between items-center mb-4">
-        <h3 className="text-xl font-bold">Daftar Rencana Kerja</h3>
-        <button className="btn btn-sm btn-outline-secondary" style={{ marginLeft: '20px', height: '30px', marginTop: '5px' }} onClick={() => navigate('/rencana-kerja/tambah')}>+ Tambah</button>
-      </div>
-
       {loading ? (
           <div className="d-flex justify-content-center mt-5 vh-100">
             <div className="spinner-border text-secondary" role="status">
@@ -104,91 +99,114 @@ export default function PlanDetail() {
           </div>
       ) : (
         <div className="row">
-          <div className="col-1">
+          <div className="col-lg-3 col-md-3 col-sm-12">
+            <div className="d-flex justify-between items-center mb-1">
               <button
                 onClick={() => navigate('/rencana-kerja')}
-                className="btn btn-md btn-outline-secondary mb-4"
+                className="btn btn-sm btn-outline-secondary mb-4"  
               >
-                ← Kembali
+                <i className='bi bi-arrow-left'></i>
               </button>
-          </div>
-          <div className="col-11">
-            <h4 className="text-2xl font-semibold mb-2">{plan.title}</h4>
-          </div>
-          <div className="col-12">
-              {workingPlan?.is_approved === 1 ? (
-                <span className="text-green-600 font-semibold">✅ Telah Disetujui Oleh : {workingPlan.approved_by}</span>
-              ) : (
-                <div className="flex items-center gap-3">
-                  <span className="text-yellow-600 font-semibold">⏳ Belum Disetujui</span>
-                  {userRole === 'pimpinan_cabang' && (
-                    <button
-                      onClick={handleApprove}
-                      className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-                    >
-                      Setujui
-                    </button>
-                  )}
-                </div>
-              )}
+              <h4 className="text-xl font-bold" style={{ marginLeft: '10px' }}>Detail Rencana Kerja</h4>
+            </div>
+            <div className="card">
+              <div className="card-body">
+                <div className="row">
+                  <div className="col-11">
+                    <h4 className="text-2xl font-semibold mb-2">{plan.title}</h4>
+                  </div>
+                  <div className="col-12">
+                      {workingPlan?.is_approved === 1 ? (
+                        <span className="text-green-600 font-semibold">✅ Telah Disetujui Oleh : {workingPlan.approved_by}</span>
+                      ) : (
+                        <div className="flex items-center gap-3">
+                          <span className="text-yellow-600 font-semibold">⏳ Belum Disetujui</span>
+                          {userRole === 'pimpinan_cabang' && (
+                            <button
+                              onClick={handleApprove}
+                              className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                            >
+                              Setujui
+                            </button>
+                          )}
+                        </div>
+                      )}
 
-              <p className="text-sm text-gray-500 mb-2">KPI: {plan.kpi_indicator}</p>
-              <p className="mb-4">
-                Mulai: {plan.start_date} | Deadline: {plan.deadline_date}
-              </p>
-              <p className="mb-6">{plan.external_info}</p>
+                      <span style={{ display: 'block' }}>KPI: <b>{plan.kpi_indicator}</b></span>
+                      <span style={{ display: 'block' }}>Mulai: <b>{plan.start_date}</b></span>
+                      <span style={{ display: 'block' }}>Deadline: <b>{plan.deadline_date}</b></span>
+                      <span style={{ display: 'block' }}>External Info : <b>{plan.external_info}</b></span>
 
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-xl font-semibold">Daftar Kegiatan</h3>
-                <button
-                  onClick={() => navigate(`/rencana-kerja/${id}/tambah-activity`)}
-                  className="bg-blue-600 text-white px-3 py-2 rounded"
-                >
-                  + Tambah Activity
-                </button>
-              </div>
-
-              {activities.length === 0 ? (
-                <p className="text-sm text-gray-500">Belum ada kegiatan.</p>
-              ) : (
-                <ul className="space-y-4">
-                  {activities.map((activity) => (
-                    <li
-                      key={activity.id}
-                      className="border p-4 rounded shadow-sm hover:shadow"
-                    >
-                      <h4 className="font-medium">{activity.title}</h4>
-                      <p className="text-sm text-gray-600">
-                        {activity.start_date} → {activity.end_date}
-                      </p>
-                      <p className="text-sm">{activity.activity_type}</p>
-                      <div className="flex gap-2 mt-2">
+                      <div className="flex justify-between items-center mb-2">
+                        <h3 className="text-xl font-semibold">Daftar Kegiatan</h3>
                         <button
-                          onClick={() =>
-                            navigate(`/rencana-kerja/${plan.id}/edit-activity/${activity.id}`)
-                          }
-                          className="text-sm text-blue-600"
+                          onClick={() => navigate(`/rencana-kerja/${id}/tambah-activity`)}
+                          className="bg-blue-600 text-white px-3 py-2 rounded"
                         >
-                          ✏️ Edit
-                        </button>
-                        <button
-                          onClick={async () => {
-                            if (confirm('Yakin ingin menghapus?')) {
-                              await supabase.from('working_activities').delete().eq('id', activity.id)
-                              setActivities((prev) => prev.filter((a) => a.id !== activity.id))
-                            }
-                          }}
-                          className="text-sm text-red-600"
-                        >
-                          🗑️ Hapus
+                          + Tambah Activity
                         </button>
                       </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
+
+                      {activities.length === 0 ? (
+                        <p className="text-sm text-gray-500">Belum ada kegiatan.</p>
+                      ) : (
+                        <ul className="space-y-4">
+                          {activities.map((activity) => (
+                            <li
+                              key={activity.id}
+                              className="border p-4 rounded shadow-sm hover:shadow"
+                            >
+                              <h4 className="font-medium">{activity.title}</h4>
+                              <p className="text-sm text-gray-600">
+                                {activity.start_date} → {activity.end_date}
+                              </p>
+                              <p className="text-sm">{activity.activity_type}</p>
+                              <div className="flex gap-2 mt-2">
+                                <button
+                                  onClick={() =>
+                                    navigate(`/rencana-kerja/${plan.id}/edit-activity/${activity.id}`)
+                                  }
+                                  className="text-sm text-blue-600"
+                                >
+                                  ✏️ Edit
+                                </button>
+                                <button
+                                  onClick={async () => {
+                                    if (confirm('Yakin ingin menghapus?')) {
+                                      await supabase.from('working_activities').delete().eq('id', activity.id)
+                                      setActivities((prev) => prev.filter((a) => a.id !== activity.id))
+                                    }
+                                  }}
+                                  className="text-sm text-red-600"
+                                >
+                                  🗑️ Hapus
+                                </button>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col-lg-9 col-md-9 col-sm-12">
+            <div className="d-flex justify-between items-center mb-4">
+              <h4 className="text-xl font-bold" style={{ marginLeft: '10px' }}>List Kegiatan</h4>
+            </div>
+            <div className="row">
+              <div className="col-12">
+                <div className="card">
+                  <div className="card-body">
+
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
     </div>
+  )
 }
