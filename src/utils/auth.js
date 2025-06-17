@@ -1,18 +1,5 @@
 import { supabase } from "../supabaseClient"
 
-export async function canModifyPlan(plan) {
-  const user = await getUserInfo();
-  if (user.role === 'pimpinan_cabang') return true
-  if (user.role === 'karyawan' && plan?.is_approved !== 1) return true
-  return false
-}
-
-export async function canModifyActivity(plan) {
-  const user = await getUserInfo();
-  // Gunakan aturan yang sama seperti working_plan
-  return canModifyPlan(user.role, plan)
-}
-
 export async function initLocalData() {
     const isSessionExist = (localStorage.getItem('userSession') || '').length ? true : false;
     const isUserListExist = (localStorage.getItem('usersList') || '').length ? true : false;
@@ -80,4 +67,8 @@ export async function getUserInfo() {
 
 export async function getLocalData(field) {
   return field && field !== '' ? JSON.parse(localStorage.getItem(field)) : null;
+}
+
+export async function signOutUser() {
+  await supabase.auth.signOut();
 }
