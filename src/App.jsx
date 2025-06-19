@@ -9,7 +9,6 @@ import EditActivityForm from './pages/WorkingPlans/EditActivityForm'
 import EditPlanForm from './pages/WorkingPlans/EditPlanForm'
 import Dashboard from './pages/Dashboard'
 import Layout from './components/Layout'
-import UsersManagement from './pages/UsersManagement'
 
 function App() {
   return (
@@ -54,11 +53,6 @@ function App() {
           <Route path="/rencana-kerja/:id/edit-activity/:activityId" element={
             <AuthGate>
               <EditActivityForm />
-            </AuthGate>
-          } />
-          <Route path="/user-management" element={
-            <AuthGate>
-              <UsersManagement />
             </AuthGate>
           } />
         </Route>

@@ -51,7 +51,14 @@ export default function Login() {
     setDisabledBtn(true);
     const email = localStorage.getItem('email');
     if (!email) {
-      alert('Please insert your email first');
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: 'Please insert your email first!',
+        confirmButtonText: 'OK',
+        showCancelButton: false,
+      })
+
       return;
     }
     
@@ -63,7 +70,14 @@ export default function Login() {
     }).then((response) => response.json())
       .then((registered_user) => {    
           if (!registered_user.status || registered_user.status !== 200) {
-            alert('Account not registered, please contact your admin');
+            Swal.fire({
+              icon: 'error',
+              title: 'Login Failed',
+              text: 'Account not registered, please contact your admin!',
+              confirmButtonText: 'OK',
+              showCancelButton: false,
+            })
+
             setDisabledBtn(false);
             return;
           }
@@ -76,7 +90,14 @@ export default function Login() {
             }
           }
       }).catch(() => {
-          alert('Account not registered, please contact your admin');
+          Swal.fire({
+            icon: 'error',
+            title: 'Login Failed',
+            text: 'Account not registered, please contact your admin!',
+            confirmButtonText: 'OK',
+            showCancelButton: false,
+          })
+          
           setDisabledBtn(false);
           return;
       });

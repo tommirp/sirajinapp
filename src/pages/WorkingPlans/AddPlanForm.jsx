@@ -70,6 +70,15 @@ export default function AddPlanForm() {
         created_at: new Date().toISOString(),
       }));
 
+      if (!involvedUsers.find(x => x.item.id === user.id)) {
+        userInvolvement.push({
+          user_id: user.id,  // Tambahkan user yang membuat rencana kerja
+          working_plan_id: planId,
+          created_by: user.email,
+          created_at: new Date().toISOString(),
+        })
+      }
+
       const { error: involvementError } = await supabase.from('working_plans_employees').insert(userInvolvement);
       if (involvementError) {
         setAlertMsg(involvementError.message);
@@ -92,6 +101,8 @@ export default function AddPlanForm() {
 
   useEffect(() => {    
     const fetchUsers = async () => {
+      const user = await getUserInfo()
+
       const { data, error } = await supabase
         .from('registered_users')
         .select('*');
@@ -101,7 +112,7 @@ export default function AddPlanForm() {
         return [];
       }
 
-      const items = data.map((item) => ({
+      const items = data.filter(x => x.email !== user.email).map((item) => ({
         value: item.id,
         label: item.full_name,
         item,
@@ -252,7 +263,7 @@ export default function AddPlanForm() {
                     <hr style={{ marginBottom: '0px' }} />
                   </div>
                   <div className="col-12">
-                    <button type="submit" className="btn btn-primary" style={{ float: 'right' }}>Save Working Plan</button>
+                    <button type="submit" className="btn btn-success" style={{ float: 'right' }}>Save Working Plan</button>
                   </div>
                 </form>
               </div>

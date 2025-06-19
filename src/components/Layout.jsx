@@ -10,7 +10,6 @@ const Layout = () => {
   useEffect(() => {
     initLocalData();
     setTimeout(() => {
-      // Simulate a delay for loading
       setIsLoading(false);
     }, 1500);
   }, []);

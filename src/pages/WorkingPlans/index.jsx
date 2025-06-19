@@ -2,6 +2,7 @@
 import { Fragment, use, useEffect, useState } from 'react'
 import { supabase } from '../../supabaseClient'
 import { useNavigate } from 'react-router-dom'
+import Swal from 'sweetalert2'
 import { getUserInfo, signOutUser } from '../../utils/auth'
 
 export default function WorkingPlansPage() {
@@ -62,13 +63,35 @@ export default function WorkingPlansPage() {
           .eq('id', planId)
   
         if (error) {
-          alert('Error deleting plan:')
+          Swal.fire({
+            icon: 'error',
+            title: 'Failed',
+            text: 'Error deleting plan',
+            confirmButtonText: 'OK',
+            showCancelButton: false,
+          })
+
         } else {
-          alert('Plan deleted successfully')
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Plan deleted successfully',
+            confirmButtonText: 'OK',
+            showCancelButton: false,
+          })
+
           fetchPlans()
         }
       }
-    } else alert('You Cannot Delete This! Your Access is Restricted!')
+    } else {
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed',
+        text: 'You Cannot Delete This! Your Access is Restricted!',
+        confirmButtonText: 'OK',
+        showCancelButton: false,
+      })
+    }
   }
 
   async function editPlan(planId) {
@@ -76,7 +99,16 @@ export default function WorkingPlansPage() {
       if (!planId) return
 
       navigate(`/rencana-kerja/edit/${planId}`)
-    } else alert('You Cannot Delete This! Your Access is Restricted!')
+    } else {
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Failed',
+        text: 'You Cannot Delete This! Your Access is Restricted!',
+        confirmButtonText: 'OK',
+        showCancelButton: false,
+      })
+    }
   }
 
   
@@ -93,10 +125,25 @@ export default function WorkingPlansPage() {
         .eq('id', id)
 
       if (error) {
-        alert('Gagal menyetujui: ' + error.message)
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed',
+          text: 'Failed to approve!',
+          confirmButtonText: 'OK',
+          showCancelButton: false,
+        })
       } else {
-        alert('Berhasil disetujui.')
-        setWorkingPlan({ ...workingPlan, is_approved: 1, approved_by: email })
+        
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Approval Success!',
+          confirmButtonText: 'OK',
+          showCancelButton: false,
+        })
+
+        fetchPlans()
       }
     }
   }
@@ -114,10 +161,25 @@ export default function WorkingPlansPage() {
         .eq('id', id)
 
       if (error) {
-        alert('Gagal mereject: ' + error.message)
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed',
+          text: 'Failed to reject!',
+          confirmButtonText: 'OK',
+          showCancelButton: false,
+        })
       } else {
-        alert('Berhasil mereject.')
-        setWorkingPlan({ ...workingPlan, is_approved: 0, approved_by: email })
+        
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Rejection Success!',
+          confirmButtonText: 'OK',
+          showCancelButton: false,
+        })
+        
+        fetchPlans()
       }
     }
   }

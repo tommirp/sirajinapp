@@ -2,6 +2,7 @@
 import React from 'react'
 import { useEffect } from 'react'
 import { Link, useNavigate  } from 'react-router-dom'
+import Swal from 'sweetalert2'
 import { getUserInfo } from '../utils/auth'
 import { supabase } from '../supabaseClient'
 import Logo from '../assets/sirajin.png';
@@ -32,9 +33,22 @@ export default function Navbar() {
   async function showUserDetail() {
     const userInfo = await getUserInfo()
     if (userInfo) {
-      alert(`Username: ${userInfo.username}\nEmail: ${userInfo.email}\nRole: ${printRole(userInfo.role)}\nBranch: ${userInfo.branch}\nBranch Region: ${userInfo.branch_region}`)
+      
+      Swal.fire({
+        title: 'User Information',
+        html: `You Are Logged In as :<br><b>${userInfo.username}<br>(${userInfo.email})</b>.<br><br>Your Role :<br><b>${userInfo.role_detail.role_name}</b><br><br>Your Branch :<br><b>${userInfo.branch}</b>`,
+        confirmButtonText: 'OK',
+        showCancelButton: false,
+      })
     } else {
-      alert('User information not available.')
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'User Information',
+        text: `User Information not found!`,
+        confirmButtonText: 'OK',
+        showCancelButton: false,
+      })
     }
   }
 
@@ -72,9 +86,6 @@ export default function Navbar() {
           </li>
           <li className="nav-item" style={{ padding: '0px 10px' }}>
             <Link className="nav-link" to="/rencana-kerja">Rencana Kerja</Link>
-          </li>
-          <li className="nav-item" style={{ padding: '0px 10px' }}>
-            <Link className="nav-link" to="/user-management">User Management</Link>
           </li>
         </ul>
         <span className="navbar-text" style={{ padding: '0px 20px 0px 10px' }}>

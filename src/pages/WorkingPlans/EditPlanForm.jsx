@@ -71,6 +71,15 @@ export default function EditPlanForm() {
         created_by: user.email,
         created_at: new Date().toISOString(),
       }));
+      
+      if (!involvedUsers.find(x => x.item.id === user.id)) {
+        userInvolvement.push({
+          user_id: user.id,  // Tambahkan user yang membuat rencana kerja
+          working_plan_id: planId,
+          created_by: user.email,
+          created_at: new Date().toISOString(),
+        })
+      }
 
       const { error: involvementError } = await supabase.from('working_plans_employees').insert(userInvolvement);
       if (involvementError) {
@@ -84,6 +93,8 @@ export default function EditPlanForm() {
   }
   
   const fetchFirst = async () => {  
+    const user = await getUserInfo()
+
     const { data: planData, error: planError } = await supabase
       .from('working_plans')
       .select('*')
@@ -126,7 +137,7 @@ export default function EditPlanForm() {
       }
 
       // Map involved users to the format required by react-select
-      const involvedUsersData = involvedData.map(item => ({
+      const involvedUsersData = involvedData.filter(x => x.user.email !== user.email).map(item => ({
         value: item.user.id,
         label: item.user.full_name,
         item: item.user,
@@ -147,7 +158,7 @@ export default function EditPlanForm() {
       return [];
     }
 
-    const items = data.map((item) => ({
+    const items = data.filter(x => x.email !== user.email).map((item) => ({
       value: item.id,
       label: item.full_name,
       item,
@@ -192,7 +203,14 @@ export default function EditPlanForm() {
               >
                 <i className='bi bi-arrow-left'></i>
               </button>
-              <h4 className="text-xl font-semibold" style={{ marginLeft: '20px' }}>Ubah Rencana Kerja</h4>
+              <button
+                className="btn btn-sm btn-success"
+                style={{ width: '40px', height: '35px', marginLeft: '10px' }}
+                onClick={() => goToActivities()}
+              >
+                <i className='bi bi-list-task'></i>
+              </button>
+              <h4 className="text-xl font-semibold" style={{ marginLeft: '10px' }}>Ubah Rencana Kerja</h4>
             </div>
             {alertMsg && alertMsg.includes('created successfully') ? (
               <Fragment>

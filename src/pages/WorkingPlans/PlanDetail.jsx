@@ -1,6 +1,7 @@
 // /src/pages/WorkingPlans/PlanDetail.jsx
 import { Fragment, useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import Swal from 'sweetalert2'
 import { supabase } from '../../supabaseClient'
 import { getUserInfo } from '../../utils/auth'
 
@@ -11,7 +12,6 @@ export default function PlanDetail() {
   const [plan, setPlan] = useState(null)
   const [activities, setActivities] = useState([])
   const [loading, setLoading] = useState(true)
-  const [workingPlan, setWorkingPlan] = useState(null)
   const [userRole, setUserRole] = useState(null)
 
   useEffect(() => {
@@ -67,10 +67,24 @@ export default function PlanDetail() {
         .eq('id', id)
 
       if (error) {
-        alert('Gagal menyetujui: ' + error.message)
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed',
+          text: 'Failed to approve!',
+          confirmButtonText: 'OK',
+          showCancelButton: false,
+        })
       } else {
-        alert('Berhasil disetujui.')
-        setWorkingPlan({ ...workingPlan, is_approved: 1, approved_by: email })
+        
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Approval Success!',
+          confirmButtonText: 'OK',
+          showCancelButton: false,
+        })
+        
+        setPlan({ ...workingPlan, is_approved: 1, approved_by: email })
       }
     }
   }
@@ -88,10 +102,22 @@ export default function PlanDetail() {
         .eq('id', id)
 
       if (error) {
-        alert('Gagal mereject: ' + error.message)
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed',
+          text: 'Failed to reject!',
+          confirmButtonText: 'OK',
+          showCancelButton: false,
+        })
       } else {
-        alert('Berhasil mereject.')
-        setWorkingPlan({ ...workingPlan, is_approved: 0, approved_by: email })
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Rejection Success!',
+          confirmButtonText: 'OK',
+          showCancelButton: false,
+        })
+        setPlan({ ...workingPlan, is_approved: 0, approved_by: email })
       }
     }
   }
@@ -99,7 +125,24 @@ export default function PlanDetail() {
   async function autoGenerateActivitiesByAI(planId) {
     if (!planId) return
 
-    alert('Coming Soon!')
+    if (plan.external_info === '' || plan.external_info === null) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Warning',
+        text: 'Deskripsi Rencana Kerja Wajib Diisi Agar AI Dapat Mempelajari Informasi Rencana Kerja!',
+        confirmButtonText: 'OK',
+        showCancelButton: false,
+      })
+      return
+    }
+
+    Swal.fire({
+      icon: 'warning',
+      title: 'Warning',
+      text: 'This Feature Will Be Ready Soon!',
+      confirmButtonText: 'OK',
+      showCancelButton: false,
+    })
     return
 
     const confirmed = window.confirm(`Are you sure you want to delete this Plan : "${title}"?`)
@@ -118,7 +161,15 @@ export default function PlanDetail() {
         }
       );
 
-      if (!res.ok) alert("Failed to auto generate activities by AI!");
+      if (!res.ok) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed',
+          text: 'Failed to generate activities by AI!',
+          confirmButtonText: 'OK',
+          showCancelButton: false,
+        })
+      }
     }
   }
 
@@ -162,7 +213,7 @@ export default function PlanDetail() {
           </div>
       ) : (
         <div className="row">
-          <div className="col-lg-3 col-md-3 col-sm-12">
+          <div className="col-lg-12 col-md-12 col-sm-12">
             <div className="d-flex justify-between items-center mb-1">
               <button
                 onClick={() => navigate('/rencana-kerja')}
@@ -170,53 +221,68 @@ export default function PlanDetail() {
               >
                 <i className='bi bi-arrow-left'></i>
               </button>
+              <button
+                style={{ marginLeft: '10px' }}
+                onClick={() => navigate(`/rencana-kerja/edit/${id}`)}
+                className="btn btn-sm btn-warning mb-4"  
+              >
+                <i className='bi bi-pencil-square'></i>
+              </button>
               <h4 className="text-xl font-bold" style={{ marginLeft: '10px' }}>Detail Rencana Kerja</h4>
             </div>
             <div className="card">
               <div className="card-body">
                 <div className="row">
-                  <div className="col-11">
-                    <label><i>Title :</i></label>
-                    <h5 className="text-2xl font-semibold mb-2">{plan.title}</h5>
+                  <div className="col-3">
+                    <label><i>Judul Rencana Kerja :</i></label>
+                    <input type="text" className="form-control" disabled={true} value={plan.title} />
                   </div>
-                  <div className="col-12 mt-2">
-                      <label><i>Approval Status :</i></label>
+                  <div className='col-2'><label><i>Tgl Mulai:</i></label>
+                    <input className="form-control" value={plan.start_date} disabled={true} />
+                  </div>
+                  <div className='col-2'><label><i>Tgl Deadline:</i></label>
+                    <input className="form-control" value={plan.deadline_date} disabled={true} />
+                  </div>
+                  <div className='col-2'><label><i>KPI Target :</i></label>
+                    <input className="form-control" value={plan.kpi_indicator} disabled={true} />
+                  </div>
+                  <div className="col-3">
+                      <label><i>Status Persetujuan :</i></label>
                       <div className="d-flex">
-                        <span style={{ color: getApprovalStatus(plan.is_approved, plan.approved_by, true, true) }}><b>{getApprovalStatus(plan.is_approved, plan.approved_by)}</b></span>
+                        <input className="form-control" disabled={true} style={{ color: getApprovalStatus(plan.is_approved, plan.approved_by, true, true) }} value={getApprovalStatus(plan.is_approved, plan.approved_by)} />
                         {!restrictedAccess('approval_workingplan') && (
                           <Fragment>
                             {!plan.approved_by && (
                               <Fragment>
                                 <button
                                   onClick={handleApprove}
-                                  style={{ marginLeft: '12px', padding: '2px 7px' }}
+                                  style={{ marginLeft: '12px' }}
                                   className="btn btn-sm btn-success"
                                 >
-                                  Approve
+                                  <i className='bi bi-check'></i>
                                 </button>
                                 <button
                                   onClick={handleReject}
-                                  style={{ marginLeft: '10px', padding: '2px 7px' }}
+                                  style={{ marginLeft: '10px' }}
                                   className="btn btn-sm btn-danger"
                                 >
-                                  Reject
+                                  <i className='bi bi-x'></i>
                                 </button>
                               </Fragment>
                             )}
                           </Fragment>
                         )}
                       </div>
-
-                      <div style={{ display: 'block' }} className='mt-2'><label><i>KPI:</i></label> <span style={{ display: 'block' }}><b>{plan.kpi_indicator}</b></span></div>
-                      <div style={{ display: 'block' }} className='mt-2'><label><i>Mulai:</i></label> <span style={{ display: 'block' }}><b>{plan.start_date}</b></span></div>
-                      <div style={{ display: 'block' }} className='mt-2'><label><i>Deadline:</i></label> <span style={{ display: 'block' }}><b>{plan.deadline_date}</b></span></div>
-                      <div style={{ display: 'block' }} className='mt-2'><label><i>External Info :</i></label> <span style={{ display: 'block' }}><b>{plan.external_info}</b></span></div>
+                  </div>
+                  <div className='col-12 mt-2'>
+                    <label><i>Deskripsi Rencana Kerja :</i></label>
+                    <textarea className="form-control" rows="2" disabled={true} defaultValue={plan.external_info}></textarea>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="col-lg-9 col-md-9 col-sm-12">
+          <div className="col-lg-12 col-md-12 col-sm-12 mt-4">
             <div className="d-flex justify-between items-center mb-4">
               <h4 className="text-xl font-bold" style={{ marginLeft: '10px' }}>List Kegiatan</h4>
               {!restrictedAccess('create_activity') && (
